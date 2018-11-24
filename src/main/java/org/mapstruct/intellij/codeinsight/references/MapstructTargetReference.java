@@ -27,10 +27,12 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteral;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.PsiVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mapstruct.intellij.util.MapstructUtil;
@@ -114,7 +116,7 @@ class MapstructTargetReference extends MapstructBaseReference {
         return publicSetters( psiType, builderSupportPresent )
             .map( pair -> MapstructUtil.asLookup(
                 pair,
-                MapstructTargetReference::firstParameterPsiType
+                MapstructTargetReference::memberPsiType
             ) )
             .toArray();
     }
@@ -149,6 +151,17 @@ class MapstructTargetReference extends MapstructBaseReference {
         return MapstructBaseReference.create( psiLiteral, MapstructTargetReference::new );
     }
 
+    private static PsiType memberPsiType(PsiMember psiMember) {
+        if ( psiMember instanceof PsiMethod ) {
+            return firstParameterPsiType( (PsiMethod) psiMember );
+        }
+        else if ( psiMember instanceof PsiVariable ) {
+            return ( (PsiVariable) psiMember ).getType();
+        } else {
+            return null;
+        }
+
+    }
     /**
      * Util function for extracting the type of the first parameter of a method.
      *

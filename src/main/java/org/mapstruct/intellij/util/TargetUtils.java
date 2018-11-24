@@ -32,11 +32,14 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiMember;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiSubstitutor;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.impl.PsiClassImplUtil;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -91,7 +94,7 @@ public class TargetUtils {
      *
      * @return a stream that holds all public setters for the given {@code psiType}
      */
-    public static Stream<Pair<PsiMethod, PsiSubstitutor>> publicSetters(@NotNull PsiType psiType,
+    public static Stream<Pair<? extends PsiMember, PsiSubstitutor>> publicSetters(@NotNull PsiType psiType,
         boolean builderSupportPresent) {
         Pair<PsiClass, PsiType> classAndType = resolveBuilderOrSelfClass( psiType, builderSupportPresent );
         if ( classAndType == null ) {
@@ -100,8 +103,8 @@ public class TargetUtils {
 
         PsiClass psiClass = classAndType.getFirst();
         PsiType typeToUse = classAndType.getSecond();
+        List<Pair<? extends PsiMember, PsiSubstitutor>> publicSetters = new ArrayList<>();
         Set<PsiMethod> overriddenMethods = new HashSet<>();
-        List<Pair<PsiMethod, PsiSubstitutor>> publicSetters = new ArrayList<>();
         for ( Pair<PsiMethod, PsiSubstitutor> pair : psiClass.getAllMethodsAndTheirSubstitutors() ) {
             PsiMethod method = pair.getFirst();
             boolean isSetter = builderSupportPresent ?
@@ -112,6 +115,18 @@ public class TargetUtils {
                 // If this is a public setter then populate its overridden methods and use it
                 overriddenMethods.addAll( Arrays.asList( method.findSuperMethods() ) );
                 publicSetters.add( pair );
+            }
+        }
+
+        List<Pair<PsiField, PsiSubstitutor>> fieldPairs = PsiClassImplUtil.getAllWithSubstitutorsByMap(
+            psiClass,
+            PsiClassImplUtil.MemberType.FIELD
+        );
+
+        for ( Pair<PsiField, PsiSubstitutor> fieldPair : fieldPairs ) {
+            PsiField field = fieldPair.getFirst();
+            if ( MapstructUtil.isPublic( field ) ) {
+                publicSetters.add( fieldPair );
             }
         }
 
