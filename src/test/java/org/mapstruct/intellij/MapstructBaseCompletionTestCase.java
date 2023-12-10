@@ -17,6 +17,7 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.pom.java.LanguageLevel;
+import com.intellij.testFramework.IdeaTestUtil;
 import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.PsiTestUtil;
 import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor;
@@ -32,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 public abstract class MapstructBaseCompletionTestCase extends LightFixtureCompletionTestCase {
 
     private static final String BUILD_LIBS_DIRECTORY = "build/libs";
-    private static final String BUILD_MOCK_JDK_DIRECTORY = "build/mockJDK-";
 
     @Override
     protected void setUp() throws Exception {
@@ -61,21 +61,12 @@ public abstract class MapstructBaseCompletionTestCase extends LightFixtureComple
             @Override
             public Sdk getSdk() {
                 JavaVersion version = languageLevel.toJavaVersion();
-                int mockJdk;
-                if ( version.feature >= 11 ) {
-                    mockJdk = 11;
-                }
-                else {
-                    mockJdk = version.feature;
-                }
-                String compilerOption = ( mockJdk < 11 ? "1." : "" ) + mockJdk;
-                return JavaSdk.getInstance()
-                    .createJdk( "java " + compilerOption, BUILD_MOCK_JDK_DIRECTORY + compilerOption, false );
+                return IdeaTestUtil.getMockJdk( version );
             }
 
             @Override
             public void configureModule(@NotNull Module module, @NotNull ModifiableRootModel model,
-                @NotNull ContentEntry contentEntry) {
+                                        @NotNull ContentEntry contentEntry) {
                 model.getModuleExtension( LanguageLevelModuleExtension.class )
                     .setLanguageLevel( languageLevel );
             }

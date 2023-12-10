@@ -16,9 +16,11 @@ import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaToken;
+import com.intellij.testFramework.LightProjectDescriptor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.intellij.lang.annotations.Language;
+import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.MapstructBaseCompletionTestCase;
 
 import static org.assertj.core.api.Assertions.assertThat;

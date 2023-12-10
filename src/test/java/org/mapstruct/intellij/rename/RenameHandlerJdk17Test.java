@@ -5,7 +5,8 @@
  */
 package org.mapstruct.intellij.rename;
 
-import com.intellij.pom.java.LanguageLevel;
+import com.intellij.testFramework.LightProjectDescriptor;
+import org.jetbrains.annotations.NotNull;
 import org.mapstruct.intellij.MapstructBaseCompletionTestCase;
 
 /**
@@ -19,8 +20,8 @@ public class RenameHandlerJdk17Test extends MapstructBaseCompletionTestCase {
     }
 
     @Override
-    protected LanguageLevel getLanguageLevel() {
-        return LanguageLevel.JDK_17;
+    protected @NotNull LightProjectDescriptor getProjectDescriptor() {
+        return JAVA_17;
     }
 
     public void testRenameRecordSourceParameter() {

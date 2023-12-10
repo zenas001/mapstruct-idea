@@ -7,9 +7,10 @@ package org.mapstruct.intellij;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
-import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecordComponent;
+import com.intellij.testFramework.LightProjectDescriptor;
+import org.jetbrains.annotations.NotNull;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mapstruct.intellij.testutil.TestUtils.createParameter;
@@ -33,8 +34,8 @@ public class MapstructCompletionJdk17TestCase extends MapstructBaseCompletionTes
     }
 
     @Override
-    protected LanguageLevel getLanguageLevel() {
-        return LanguageLevel.JDK_17;
+    protected @NotNull LightProjectDescriptor getProjectDescriptor() {
+        return JAVA_17;
     }
 
     private void assertCarDtoRecordAutoComplete() {
